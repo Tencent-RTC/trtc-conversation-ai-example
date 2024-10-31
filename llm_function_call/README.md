@@ -1,46 +1,45 @@
-
 # FastAPI LangChain Function Calling 
 
-## 安装
+## Installation
 
-1. 确保您已安装 Python 3.7+。
+1. Ensure you have Python 3.7+ installed.
 
-2. 创建并激活虚拟环境（可选但推荐）：
+2. Create and activate a virtual environment (optional but recommended):
 ```bash
 python -m venv venv
-source venv/bin/activate  # 在 Windows 上使用 venv\Scripts\activate
+source venv/bin/activate  # On Windows use venv\Scripts\activate
 ```
 
-3. 安装所需依赖：
+3. Install required dependencies:
 ```bash
 pip install fastapi uvicorn langchain-openai langchain pydantic python-dotenv
 ```
 
-## 配置
+## Configuration
 
-1. 在项目根目录创建 `.env` 文件，并添加以下内容：
+1. Create a `.env` file in the project root directory and add the following:
 ```
 OPENAI_API_KEY=your_openai_api_key_here
-MODEL=gpt-4  # 或其他您想使用的模型
-BASE_URL=https://api.openai.com/v1  # 如果使用默认 OpenAI API，可以省略此行
+MODEL=gpt-4  # or other model you want to use
+BASE_URL=https://api.openai.com/v1  # can be omitted if using default OpenAI API
 ```
 
-2. 将您的 OpenAI API 密钥替换 `your_openai_api_key_here`。
+2. Replace `your_openai_api_key_here` with your OpenAI API key.
 
-## 运行应用
+## Running the Application
 
-1. 在命令行中运行：
+1. Run in command line:
 ```bash
 python main.py
 ```
 
-2. 应用将在 `http://0.0.0.0:8000` 上启动。
+2. The application will start at `http://0.0.0.0:8000`.
 
-## 使用 API
+## Using the API
 
-应用提供了一个 POST 端点 `/v1/chat/completions`，用于发送聊天请求。
+The application provides a POST endpoint `/v1/chat/completions` for sending chat requests.
 
-示例请求：
+Example request:
 ```bash
 curl -X POST "http://localhost:8000/v1/chat/completions" \
      -H "Content-Type: application/json" \
@@ -52,18 +51,18 @@ curl -X POST "http://localhost:8000/v1/chat/completions" \
      }'
 ```
 
-API 将返回一个包含 AI 助手回复的 JSON 响应。
+The API will return a JSON response containing the AI assistant's reply.
 
-## 注意事项
+## Notes
 
-- 此应用使用 FastAPI 框架和 LangChain 库。
-- 它包含一个自定义工具 `current_time`，可以获取当前时间。
-- 应用使用内存存储聊天历史，重启后历史将丢失。
-- CORS 中间件已启用，允许所有来源的请求。
+- This application uses the FastAPI framework and LangChain library.
+- It includes a custom tool `current_time` that can get the current time.
+- The application uses memory storage for chat history, which will be lost after restart.
+- CORS middleware is enabled, allowing requests from all origins.
 
-## 自定义
+## Customization
 
-- 要添加新工具，在 `tools` 列表中添加新的 `@tool` 装饰函数。
-- 可以通过修改 `prompt` 变量来自定义系统提示。
-- 通过更改 `MODEL` 环境变量可以选择不同的 OpenAI 模型。
+- To add new tools, add new `@tool` decorated functions to the `tools` list.
+- You can customize the system prompt by modifying the `prompt` variable.
+- Different OpenAI models can be selected by changing the `MODEL` environment variable.
 

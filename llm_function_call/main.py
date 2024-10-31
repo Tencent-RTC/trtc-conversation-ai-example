@@ -18,6 +18,7 @@ import os
 import uvicorn
 import json
 import time
+import uuid
 
 import dotenv
 
@@ -109,8 +110,6 @@ async def proxy_chat_completions(request: ChatCompletionRequest):
 
     response = agent_with_chat_history.invoke({"input": human_input}, config)
 
-    print(response)
-
     return ChatResponse(
         id="chatcmpl-" + "".join([str(ord(c))
                                   for c in response['output'][:8]]),
@@ -133,12 +132,29 @@ async def proxy_chat_completions(request: ChatCompletionRequest):
     )
 
 
-def format_chunk(chunk, handler, finish=False):
+async def process_messages_stream(human_input: str):
+
+    config = {"configurable": {"session_id": "test-session"}}
+    response_id = uuid.uuid4().hex
+
+    async for chunk in agent_executor.astream(
+        {"input": human_input},
+        config
+    ):
+        if isinstance(chunk, dict) and "output" in chunk:
+            for token in chunk["output"].split():
+                yield f"data: {json.dumps(format_chunk(token, response_id))}\n\n"
+
+    yield f"data: {json.dumps(format_chunk(None, response_id, finish=True))}\n\n"
+    yield "data: [DONE]\n\n"
+
+
+def format_chunk(chunk, response_id, finish=False):
     return {
-        "id": handler.response_id,
+        "id": response_id,
         "object": "chat.completion.chunk",
-        "created": handler.created,
-        "model": "gpt-3.5-turbo-0301",
+        "created": int(time.time()),
+        "model": "gpt-4o",
         "choices": [{
             "index": 0,
             "delta": {} if finish else {"content": chunk},
